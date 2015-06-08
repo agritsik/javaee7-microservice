@@ -23,6 +23,7 @@ import static org.junit.Assert.*;
 public class PostServiceTest                {
 
     public static final String TITLE = "My first post!";
+    public static final String TITLE_EDITED = "My edited first post!";
 
     @Deployment
     public static Archive<?> createDeployment() {
@@ -57,5 +58,28 @@ public class PostServiceTest                {
         assertNotNull(post);
         assertEquals(TITLE, post.getTitle());
 
+    }
+
+    @Test
+    @InSequence(3)
+    public void testUpdate() throws Exception {
+
+        Post post = postService.find(TestContext.createdId);
+        post.setTitle(TITLE_EDITED);
+        postService.update(post);
+
+        Post updatedPost = postService.find(TestContext.createdId);
+
+        assertEquals(TITLE_EDITED, updatedPost.getTitle());
+
+    }
+
+    @Test
+    @InSequence(4)
+    public void testRemove() throws Exception {
+        postService.remove(TestContext.createdId);
+
+        Post post = postService.find(TestContext.createdId);
+        assertNull(post);
     }
 }

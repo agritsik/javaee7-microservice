@@ -24,4 +24,13 @@ public class PostService {
         return entityManager.find(Post.class, id);
     }
 
+    public Post update(Post post){
+        return entityManager.merge(post);
+    }
+
+    public void remove(long id){
+        Post post = entityManager.find(Post.class, id);
+        entityManager.remove(post);
+    }
+
 }
