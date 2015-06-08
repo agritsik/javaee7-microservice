@@ -22,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import java.net.URL;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -32,6 +33,8 @@ import static org.junit.Assert.assertNotNull;
  */
 @RunWith(Arquillian.class)
 public class PostResourceTest extends TestCase{
+
+    private static final Logger LOGGER = Logger.getLogger(PostResourceTest.class.getName());
 
     @ArquillianResource
     URL url;
@@ -49,7 +52,7 @@ public class PostResourceTest extends TestCase{
     public void testCreate() throws Exception {
 
         Client client = ClientBuilder.newClient();
-        client.register(new LoggingFilter());
+        client.register(new LoggingFilter(LOGGER, true));
         WebTarget target = client.target(new URL(url, "resources/posts").toExternalForm());
 
         Post post = new Post();
@@ -59,6 +62,7 @@ public class PostResourceTest extends TestCase{
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
         assertNotNull(response.getLocation());
+        assertNotNull(response.toString());
 
         TestContext.createdURL = response.getLocation();
 
@@ -69,7 +73,7 @@ public class PostResourceTest extends TestCase{
     public void testFind() throws Exception {
 
         Client client = ClientBuilder.newClient();
-        client.register(new LoggingFilter());
+        client.register(new LoggingFilter(LOGGER, true));
 
         Post post = client.target(TestContext.createdURL)
                 .request(MediaType.APPLICATION_JSON).get(Post.class);
