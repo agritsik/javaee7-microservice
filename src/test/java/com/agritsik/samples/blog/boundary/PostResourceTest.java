@@ -21,11 +21,8 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.net.URI;
 import java.net.URL;
 import java.util.logging.Logger;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by andrey on 6/7/15.
@@ -56,17 +53,17 @@ public class PostResourceTest extends TestCase{
         client.register(new LoggingFilter(LOGGER, true));
         WebTarget target = client.target(new URL(url, "resources/posts").toExternalForm());
 
+        // create post
         Post post = new Post();
         post.setTitle(TITLE);
 
         Response response = target.request(MediaType.APPLICATION_JSON).post(Entity.json(post));
 
+        // check result
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
         assertNotNull(response.getLocation());
-        assertNotNull(response.toString());
 
         TestContext.createdURL = response.getLocation();
-
     }
 
     @Test
@@ -76,6 +73,7 @@ public class PostResourceTest extends TestCase{
         Client client = ClientBuilder.newClient();
         client.register(new LoggingFilter(LOGGER, true));
 
+        // try to find post by location
         Post post = client.target(TestContext.createdURL)
                 .request(MediaType.APPLICATION_JSON).get(Post.class);
 
@@ -90,17 +88,17 @@ public class PostResourceTest extends TestCase{
         Client client = ClientBuilder.newClient();
         client.register(new LoggingFilter(LOGGER, true));
 
-        // get entity by url
+        // find post by location
         Post post = client.target(TestContext.createdURL)
                 .request(MediaType.APPLICATION_JSON).get(Post.class);
         post.setTitle(TITLE_EDITED);
 
-        // try to update entity
+        // try to update post
         WebTarget target = client.target(new URL(url, "resources/posts").toExternalForm());
         Response response = target.path(String.valueOf(post.getId()))
                 .request(MediaType.APPLICATION_JSON).put(Entity.json(post));
 
-        // check update result
+        // check result
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
         Post updatedPost = client.target(TestContext.createdURL)
@@ -116,10 +114,11 @@ public class PostResourceTest extends TestCase{
         Client client = ClientBuilder.newClient();
         client.register(new LoggingFilter(LOGGER, true));
 
+        // try to delete post
         Response response = client.target(TestContext.createdURL)
                 .request(MediaType.APPLICATION_JSON).delete();
 
-        // check delete result
+        // check result
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
         Post deletedPost = client.target(TestContext.createdURL)
                 .request(MediaType.APPLICATION_JSON).get(Post.class);

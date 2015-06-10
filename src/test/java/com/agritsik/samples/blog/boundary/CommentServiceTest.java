@@ -1,6 +1,8 @@
 package com.agritsik.samples.blog.boundary;
 
+import com.agritsik.samples.blog.entity.Comment;
 import com.agritsik.samples.blog.entity.Post;
+import com.agritsik.samples.blog.boundary.CommentService;
 import com.agritsik.samples.blog.boundary.PostService;
 import com.agritsik.samples.blog.boundary.TestContext;
 import junit.framework.TestCase;
@@ -16,15 +18,16 @@ import org.junit.runner.RunWith;
 
 import javax.ejb.EJB;
 
+import java.util.List;
+
 /**
- * Created by andrey on 6/6/15.
+ * Created by andrey on 6/10/15.
  */
-
 @RunWith(Arquillian.class)
-public class PostServiceTest extends TestCase {
+public class CommentServiceTest extends TestCase {
 
-    public static final String TITLE = "My first post!";
-    public static final String TITLE_EDITED = "My edited first post!";
+    public static final String MESSAGE = "my first comment";
+    public static final String EMAIL = "commentor1@agritsik.com";
 
     @Deployment
     public static Archive<?> createDeployment() {
@@ -34,6 +37,8 @@ public class PostServiceTest extends TestCase {
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
+    @EJB
+    CommentService commentService;
 
     @EJB
     PostService postService;
@@ -43,44 +48,30 @@ public class PostServiceTest extends TestCase {
     public void testCreate() throws Exception {
 
         Post post = new Post();
-        post.setTitle(TITLE);
+        post.setTitle("Post with comments");
+
         postService.create(post);
 
-        assertNotNull(post.getId());
-        TestContext.createdId = post.getId();
+        Comment comment = new Comment();
+        comment.setEmail(EMAIL);
+        comment.setMessage(MESSAGE);
 
+        commentService.create(comment, post.getId());
+
+        assertNotNull(comment.getId());
+
+
+        TestContext.createdId = post.getId();
     }
 
     @Test
     @InSequence(2)
-    public void testFind() throws Exception {
+    public void testFindAllByPost() throws Exception {
 
-        Post post = postService.find(TestContext.createdId);
-        assertNotNull(post);
-        assertEquals(TITLE, post.getTitle());
+        List<Comment> allByPost = commentService.findAllByPost(TestContext.createdId);
 
-    }
+        assertEquals(1, allByPost.size());
+        assertEquals(MESSAGE, allByPost.get(0).getMessage());
 
-    @Test
-    @InSequence(3)
-    public void testUpdate() throws Exception {
-
-        Post post = postService.find(TestContext.createdId);
-        post.setTitle(TITLE_EDITED);
-        postService.update(post);
-
-        Post updatedPost = postService.find(TestContext.createdId);
-
-        assertEquals(TITLE_EDITED, updatedPost.getTitle());
-
-    }
-
-    @Test
-    @InSequence(4)
-    public void testRemove() throws Exception {
-        postService.remove(TestContext.createdId);
-
-        Post post = postService.find(TestContext.createdId);
-        assertNull(post);
     }
 }
