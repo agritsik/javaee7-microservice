@@ -5,6 +5,7 @@ import com.agritsik.samples.blog.entity.Post;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 /**
  * Created by andrey on 6/6/15.
@@ -31,6 +32,11 @@ public class PostService {
     public void remove(long id){
         Post post = entityManager.find(Post.class, id);
         entityManager.remove(post);
+    }
+
+    public List<Post> find(int first, int maxResult){
+        return entityManager.createNamedQuery("Post.findAll")
+                .setFirstResult(first).setMaxResults(maxResult).getResultList();
     }
 
 }

@@ -1,8 +1,6 @@
 package com.agritsik.samples.blog.boundary;
 
 import com.agritsik.samples.blog.entity.Post;
-import com.agritsik.samples.blog.boundary.PostService;
-import com.agritsik.samples.blog.boundary.TestContext;
 import junit.framework.TestCase;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -15,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.ejb.EJB;
+import java.util.List;
 
 /**
  * Created by andrey on 6/6/15.
@@ -82,5 +81,31 @@ public class PostServiceTest extends TestCase {
 
         Post post = postService.find(TestContext.createdId);
         assertNull(post);
+    }
+
+    @Test
+    @InSequence(5)
+    public void testFind1() throws Exception {
+
+        // create multiple posts
+        for (int i = 0; i < 85; i++) {
+            Post post = new Post();
+            post.setTitle("Another post #" + i);
+            postService.create(post);
+        }
+
+        List<Post> posts;
+
+        // check first page
+        posts = postService.find(0, 10);
+        assertEquals(10, posts.size());
+        assertEquals("Another post #0", posts.get(0).getTitle());
+        assertEquals("Another post #8", posts.get(8).getTitle());
+
+        // check last page
+        posts = postService.find(80, 10);
+        assertEquals(5, posts.size());
+        assertEquals("Another post #80", posts.get(0).getTitle());
+
     }
 }

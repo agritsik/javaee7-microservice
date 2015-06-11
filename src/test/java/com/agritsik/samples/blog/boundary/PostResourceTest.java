@@ -18,17 +18,18 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
 import java.net.URL;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
  * Created by andrey on 6/7/15.
  */
 @RunWith(Arquillian.class)
-public class PostResourceTest extends TestCase{
+public class PostResourceTest extends TestCase {
 
     private static final Logger LOGGER = Logger.getLogger(PostResourceTest.class.getName());
     public static final String TITLE = "My new post via REST!";
@@ -125,6 +126,31 @@ public class PostResourceTest extends TestCase{
 
         assertNull(deletedPost);
 
+
+    }
+
+    @Test
+    @InSequence(5)
+    public void testFind1() throws Exception {
+
+        Client client = ClientBuilder.newClient();
+        client.register(new LoggingFilter(LOGGER, true));
+        WebTarget target = client.target(new URL(url, "resources/posts").toExternalForm());
+
+        // create posts
+        for (int i = 0; i < 85; i++) {
+            Post post = new Post();
+            post.setTitle("Another post #" + i);
+            target.request(MediaType.APPLICATION_JSON).post(Entity.json(post));
+        }
+
+        // try to find posts
+        List<Post> posts = target.queryParam("start", 0).queryParam("maxResult", 10)
+                .request(MediaType.APPLICATION_JSON).get(new GenericType<List<Post>>() {});
+
+        // check result
+        assertEquals(10, posts.size());
+        assertEquals("Another post #0", posts.get(0).getTitle());
 
     }
 }

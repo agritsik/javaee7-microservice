@@ -8,6 +8,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.util.List;
 
 /**
  * Created by andrey on 6/7/15.
@@ -50,6 +51,11 @@ public class PostResource {
     public Response delete(@PathParam("id") long id){
         postService.remove(id);
         return Response.status(Response.Status.NO_CONTENT).build();
+    }
+
+    @GET
+    public List<Post> find(@QueryParam("first") int first, @QueryParam("maxResult") int maxResult){
+        return postService.find(first, maxResult);
     }
 
 }
