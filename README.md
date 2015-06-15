@@ -12,12 +12,13 @@ mvn clean && mvn test -P arquillian-wildfly-managed
 ```
 
 ## Run application
-The most straightforward way to do it is via docker. There is a script srartup.sh which makes package, runs database docker container and glassfish docker container. 
+The most straightforward way to do it is via docker. There is a script srartup.sh which makes package, runs database docker container and glassfish or wildfly docker container. 
 ```
-sh docker/startup.sh
+sh docker/startup-gf.sh
+# OR
+sh docker/startup-wf.sh
 ```
-You can check Blog microservice by [http://docker-host:8080/blog/resources/posts](http://docker-host:8080/blog/resources/posts)
-
+You can check Blog microservice  [http://docker-host:8080/blog/resources/posts](http://docker-host:8080/blog/resources/posts)
 
 
 
