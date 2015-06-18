@@ -4,6 +4,7 @@ import com.agritsik.samples.blog.entity.Post;
 import junit.framework.TestCase;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -38,7 +39,7 @@ public class PostResourceTest extends TestCase {
     @ArquillianResource
     URL url;
 
-    @Deployment(testable = false)
+    @Deployment
     public static Archive<?> createDeployment() {
         return ShrinkWrap.create(WebArchive.class, "test.war")
                 .addPackages(true, "com.agritsik")
@@ -47,6 +48,7 @@ public class PostResourceTest extends TestCase {
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
+    @RunAsClient
     @Test
     @InSequence(1)
     public void testCreate() throws Exception {
@@ -68,6 +70,7 @@ public class PostResourceTest extends TestCase {
         TestContext.createdURL = response.getLocation();
     }
 
+    @RunAsClient
     @Test
     @InSequence(2)
     public void testFind() throws Exception {
@@ -84,6 +87,7 @@ public class PostResourceTest extends TestCase {
 
     }
 
+    @RunAsClient
     @Test
     @InSequence(3)
     public void testUpdate() throws Exception {
@@ -109,6 +113,7 @@ public class PostResourceTest extends TestCase {
 
     }
 
+    @RunAsClient
     @Test
     @InSequence(4)
     public void testDelete() throws Exception {
@@ -130,6 +135,7 @@ public class PostResourceTest extends TestCase {
 
     }
 
+    @RunAsClient
     @Test
     @InSequence(5)
     public void testFind1() throws Exception {

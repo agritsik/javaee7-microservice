@@ -2,8 +2,10 @@ package com.agritsik.samples.blog.boundary;
 
 import com.agritsik.samples.blog.entity.Comment;
 import com.agritsik.samples.blog.entity.Post;
+import junit.framework.TestCase;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -25,14 +27,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
-
 /**
  * Created by andrey on 6/10/15.
  */
 
 @RunWith(Arquillian.class)
-public class CommentResourceTest {
+public class CommentResourceTest extends TestCase {
     public static final Logger LOGGER = Logger.getLogger(CommentResourceTest.class.getName());
     public static final String MESSAGE = "My comment";
 
@@ -40,7 +40,7 @@ public class CommentResourceTest {
     @ArquillianResource
     URL url;
 
-    @Deployment(testable = false)
+    @Deployment
     public static Archive<?> createDeployment() {
         return ShrinkWrap.create(WebArchive.class, "test.war")
                 .addPackages(true, "com.agritsik")
@@ -49,6 +49,7 @@ public class CommentResourceTest {
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
+    @RunAsClient
     @Test
     @InSequence(1)
     public void testCreate() throws Exception {
@@ -78,6 +79,7 @@ public class CommentResourceTest {
 
     }
 
+    @RunAsClient
     @Test
     @InSequence(2)
     public void testFindAllByPost() throws Exception {

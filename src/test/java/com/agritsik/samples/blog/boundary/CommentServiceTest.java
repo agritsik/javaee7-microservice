@@ -2,9 +2,6 @@ package com.agritsik.samples.blog.boundary;
 
 import com.agritsik.samples.blog.entity.Comment;
 import com.agritsik.samples.blog.entity.Post;
-import com.agritsik.samples.blog.boundary.CommentService;
-import com.agritsik.samples.blog.boundary.PostService;
-import com.agritsik.samples.blog.boundary.TestContext;
 import junit.framework.TestCase;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -17,7 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import javax.ejb.EJB;
-
 import java.util.List;
 
 /**
