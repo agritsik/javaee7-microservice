@@ -60,7 +60,7 @@
         </profile>
 
         <profile>
-            <id>arquillian-glassfish-embedded</id>
+            <id>arquillian-glassfish</id>
             <dependencies>
                 <dependency>
                     <groupId>org.jboss.arquillian.container</groupId>
@@ -88,7 +88,7 @@
         </profile>
 
         <profile>
-            <id>arquillian-wildfly-managed</id>
+            <id>arquillian-wildfly</id>
             <dependencies>
                 <dependency>
                     <groupId>org.wildfly</groupId>
