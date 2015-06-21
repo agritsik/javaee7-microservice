@@ -2,9 +2,7 @@ package com.agritsik.samples.blog.boundary;
 
 import com.agritsik.samples.blog.entity.Post;
 import junit.framework.TestCase;
-import org.glassfish.jersey.filter.LoggingFilter;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.arquillian.test.api.ArquillianResource;
@@ -12,6 +10,7 @@ import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -39,7 +38,10 @@ public class PostResourceTest extends TestCase {
     @ArquillianResource
     URL url;
 
-    @Deployment
+    private Client client;
+    private WebTarget postsTarget;
+
+    @Deployment(testable = false)
     public static Archive<?> createDeployment() {
         return ShrinkWrap.create(WebArchive.class, "test.war")
                 .addPackages(true, "com.agritsik")
@@ -48,20 +50,22 @@ public class PostResourceTest extends TestCase {
                 .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
     }
 
-    @RunAsClient
+
+    @Before
+    public void setUp() throws Exception {
+        this.client = ClientBuilder.newClient();
+        this.postsTarget = client.target(new URL(url, "resources/posts").toExternalForm());
+    }
+
     @Test
     @InSequence(1)
     public void testCreate() throws Exception {
-
-        Client client = ClientBuilder.newClient();
-        client.register(new LoggingFilter(LOGGER, true));
-        WebTarget target = client.target(new URL(url, "resources/posts").toExternalForm());
 
         // create post
         Post post = new Post();
         post.setTitle(TITLE);
 
-        Response response = target.request(MediaType.APPLICATION_JSON).post(Entity.json(post));
+        Response response = this.postsTarget.request(MediaType.APPLICATION_JSON).post(Entity.json(post));
 
         // check result
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -70,89 +74,67 @@ public class PostResourceTest extends TestCase {
         TestContext.createdURL = response.getLocation();
     }
 
-    @RunAsClient
     @Test
     @InSequence(2)
     public void testFind() throws Exception {
 
-        Client client = ClientBuilder.newClient();
-        client.register(new LoggingFilter(LOGGER, true));
-
         // try to find post by location
-        Post post = client.target(TestContext.createdURL)
-                .request(MediaType.APPLICATION_JSON).get(Post.class);
+        Post post = this.client.target(TestContext.createdURL).request(MediaType.APPLICATION_JSON).get(Post.class);
 
         System.out.println(post);
         assertNotNull(post);
 
     }
 
-    @RunAsClient
     @Test
     @InSequence(3)
     public void testUpdate() throws Exception {
-        Client client = ClientBuilder.newClient();
-        client.register(new LoggingFilter(LOGGER, true));
 
         // find post by location
-        Post post = client.target(TestContext.createdURL)
-                .request(MediaType.APPLICATION_JSON).get(Post.class);
+        Post post = this.client.target(TestContext.createdURL).request(MediaType.APPLICATION_JSON).get(Post.class);
         post.setTitle(TITLE_EDITED);
 
         // try to update post
-        WebTarget target = client.target(new URL(url, "resources/posts").toExternalForm());
-        Response response = target.path(String.valueOf(post.getId()))
+        Response response = this.postsTarget.path(String.valueOf(post.getId()))
                 .request(MediaType.APPLICATION_JSON).put(Entity.json(post));
 
         // check result
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
 
-        Post updatedPost = client.target(TestContext.createdURL)
-                .request(MediaType.APPLICATION_JSON).get(Post.class);
+        Post updatedPost = client.target(TestContext.createdURL).request(MediaType.APPLICATION_JSON).get(Post.class);
         assertEquals(TITLE_EDITED, updatedPost.getTitle());
 
     }
 
-    @RunAsClient
     @Test
     @InSequence(4)
     public void testDelete() throws Exception {
 
-        Client client = ClientBuilder.newClient();
-        client.register(new LoggingFilter(LOGGER, true));
-
         // try to delete post
-        Response response = client.target(TestContext.createdURL)
-                .request(MediaType.APPLICATION_JSON).delete();
+        Response response = client.target(TestContext.createdURL).request(MediaType.APPLICATION_JSON).delete();
 
         // check result
         assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
-        Post deletedPost = client.target(TestContext.createdURL)
-                .request(MediaType.APPLICATION_JSON).get(Post.class);
+        Post deletedPost = client.target(TestContext.createdURL).request(MediaType.APPLICATION_JSON).get(Post.class);
 
         assertNull(deletedPost);
 
 
     }
 
-    @RunAsClient
     @Test
     @InSequence(5)
     public void testFind1() throws Exception {
-
-        Client client = ClientBuilder.newClient();
-        client.register(new LoggingFilter(LOGGER, true));
-        WebTarget target = client.target(new URL(url, "resources/posts").toExternalForm());
 
         // create posts
         for (int i = 0; i < 85; i++) {
             Post post = new Post();
             post.setTitle("Another post #" + i);
-            target.request(MediaType.APPLICATION_JSON).post(Entity.json(post));
+            this.postsTarget.request(MediaType.APPLICATION_JSON).post(Entity.json(post));
         }
 
         // try to find posts
-        List<Post> posts = target.queryParam("start", 0).queryParam("maxResult", 10)
+        List<Post> posts = this.postsTarget.queryParam("start", 0).queryParam("maxResult", 10)
                 .request(MediaType.APPLICATION_JSON).get(new GenericType<List<Post>>() {});
 
         // check result

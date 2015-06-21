@@ -10,8 +10,12 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <failOnMissingWebXml>false</failOnMissingWebXml>
-        <org.wildfly>8.2.0.Final</org.wildfly>
-        <org.glassfish>4.1</org.glassfish>
+
+        <javaee-api.version>7.0</javaee-api.version>
+        <junit.version>4.12</junit.version>
+        <wildfly.version>8.2.0.Final</wildfly.version>
+        <glassfish.version>4.1</glassfish.version>
+        <jersey-client.version>2.18</jersey-client.version>
     </properties>
 
     <dependencyManagement>
@@ -30,13 +34,13 @@
         <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
-            <version>7.0</version>
+            <version>${javaee-api.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -44,13 +48,15 @@
             <artifactId>arquillian-junit-container</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.glassfish.main.extras</groupId>
-            <artifactId>glassfish-embedded-all</artifactId>
-            <version>${org.glassfish}</version>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
+
+    <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+    </build>
 
 
     <profiles>
@@ -71,15 +77,12 @@
                 <dependency>
                     <groupId>org.glassfish.main.extras</groupId>
                     <artifactId>glassfish-embedded-all</artifactId>
-                    <version>${org.glassfish}</version>
+                    <version>${glassfish.version}</version>
                     <scope>test</scope>
                 </dependency>
             </dependencies>
             <build>
                 <testResources>
-                    <testResource>
-                        <directory>src/test/resources</directory>
-                    </testResource>
                     <testResource>
                         <directory>src/test/resources-glassfish-embedded</directory>
                     </testResource>
@@ -90,18 +93,44 @@
         <profile>
             <id>arquillian-wildfly</id>
             <dependencies>
+
                 <dependency>
                     <groupId>org.wildfly</groupId>
                     <artifactId>wildfly-arquillian-container-managed</artifactId>
-                    <version>${org.wildfly}</version>
+                    <version>${wildfly.version}</version>
                     <scope>test</scope>
                 </dependency>
+
+                <!-- rest client via jersey-->
+                <dependency>
+                    <groupId>org.glassfish.jersey.core</groupId>
+                    <artifactId>jersey-client</artifactId>
+                    <version>${jersey-client.version}</version>
+                    <scope>test</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.glassfish.jersey.media</groupId>
+                    <artifactId>jersey-media-json-jackson</artifactId>
+                    <version>${jersey-client.version}</version>
+                    <scope>test</scope>
+                </dependency>
+
+                <!-- rest client via resteasy-->
+                <!--<dependency>-->
+                    <!--<groupId>org.jboss.resteasy</groupId>-->
+                    <!--<artifactId>resteasy-client</artifactId>-->
+                    <!--<version>3.0.5.Final</version>-->
+                    <!--<scope>test</scope>-->
+                <!--</dependency>-->
+                <!--<dependency>-->
+                    <!--<groupId>org.jboss.resteasy</groupId>-->
+                    <!--<artifactId>resteasy-jackson2-provider</artifactId>-->
+                    <!--<version>3.0.5.Final</version>-->
+                    <!--<scope>test</scope>-->
+                <!--</dependency>-->
             </dependencies>
             <build>
                 <testResources>
-                    <testResource>
-                        <directory>src/test/resources</directory>
-                    </testResource>
                     <testResource>
                         <directory>src/test/resources-jbossas-managed</directory>
                     </testResource>
@@ -122,7 +151,7 @@
                                         <artifactItem>
                                             <groupId>org.wildfly</groupId>
                                             <artifactId>wildfly-dist</artifactId>
-                                            <version>${org.wildfly}</version>
+                                            <version>${wildfly.version}</version>
                                             <type>zip</type>
                                             <overWrite>false</overWrite>
                                             <outputDirectory>${project.build.directory}</outputDirectory>
@@ -137,7 +166,7 @@
                         <version>2.18.1</version>
                         <configuration>
                             <environmentVariables>
-                                <JBOSS_HOME>${project.build.directory}/wildfly-${org.wildfly}</JBOSS_HOME>
+                                <JBOSS_HOME>${project.build.directory}/wildfly-${wildfly.version}</JBOSS_HOME>
                             </environmentVariables>
                         </configuration>
                     </plugin>
