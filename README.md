@@ -6,9 +6,9 @@ The microservices-based application using Java EE 7, JPA and RESTful Web Service
 For integration testing I added Arquillian with 2 profiles for grassfish 4.1 and wildfly 8.2 containers.
 Run integration test 
 ```
-mvn clean && mvn test -Parquillian-glassfish-embedded
+mvn clean && mvn test -Parquillian-glassfish
 # OR 
-mvn clean && mvn test -P arquillian-wildfly-managed
+mvn clean && mvn test -P arquillian-wildfly
 ```
 
 ## Run application
