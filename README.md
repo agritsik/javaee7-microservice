@@ -7,8 +7,13 @@ For integration testing I added Arquillian with 2 profiles for grassfish 4.1 and
 Run integration test 
 ```
 mvn clean && mvn test -Parquillian-glassfish
-# OR 
 mvn clean && mvn test -P arquillian-wildfly
+
+# OR for docker
+
+sh docker/run-integration-tests-gf.sh
+sh docker/run-integration-tests-wf.sh
+
 ```
 
 ## Run application
